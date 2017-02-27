@@ -7,47 +7,42 @@ import org.newdawn.slick.Sound;
 import org.newdawn.slick.geom.Vector2f;
 import org.newdawn.slick.state.StateBasedGame;
 
+@SuppressWarnings("UnusedParameters")
 public class FlyingItem {
+	private Sound sound;
+
+    private Image renderImage;
+
+    private boolean soundPlayed = false;
 	
-	String imageReference;
-	String soundReference;
-	
-	boolean flyDirectionRight;
-	boolean soundPlayed = false;
-	
-	float flySpeed; //pixels/second
-	float spinSpeed; //degrees/second
-	float appearanceFrequency; //minutes/appearance
-	float slope; //travel slope
-	float rotation; //degrees
-	
-	final float MAXIMUM_APPEARANCE_FREQUENCY = 0.2f;
-	final float MINIMUM_APPEARANCE_FREQUENCY = 0.25f;
-	final float MAXIMUM_SLOPE;
-	
-	Image renderImage;
-	
-	Sound sound;
-	
-	Vector2f position = new Vector2f();
-	Vector2f initialPosition = new Vector2f();
+	private final Vector2f position = new Vector2f();
+	private final Vector2f initialPosition = new Vector2f();
+
+    private final boolean FLY_RIGHT;
+
+    private final float SLOPE; //travel SLOPE
+    private final float FLY_SPEED; //pixels/second
+    private final float SPIN_SPEED; //degrees/second
+    private final float APPEARANCE_FREQUENCY; //minutes/appearance
+
+    private static final float MAXIMUM_APPEARANCE_FREQUENCY = 0.2f;
+    private static final float MINIMUM_APPEARANCE_FREQUENCY = 0.25f;
 	
 	public FlyingItem(String imageReference, String soundReference, GameContainer gc, float flySpeed, float spinSpeed, float scale) {
-		this.imageReference = imageReference;
 		if(flySpeed > 0) {
-			this.flySpeed = flySpeed;
+			this.FLY_SPEED = flySpeed;
 		} else {
-			this.flySpeed = 1000;
+			this.FLY_SPEED = 1000;
 		}
 		if(spinSpeed > 0) {
-			this.spinSpeed = spinSpeed;
+			this.SPIN_SPEED = spinSpeed;
 		} else {
-			this.spinSpeed = 360;
+			this.SPIN_SPEED = 360;
 		}
-		this.appearanceFrequency = Logic.generateRandomFloat(MINIMUM_APPEARANCE_FREQUENCY, MAXIMUM_APPEARANCE_FREQUENCY);
-		//this.appearanceFrequency = 0.1f;
-		MAXIMUM_SLOPE = ((float)gc.getHeight()/2.0f)/(float)gc.getWidth()/2.0f;
-		this.slope = Logic.generateRandomFloat(0, MAXIMUM_SLOPE) - MAXIMUM_SLOPE;
+		this.APPEARANCE_FREQUENCY = Logic.generateRandomFloat(MINIMUM_APPEARANCE_FREQUENCY, MAXIMUM_APPEARANCE_FREQUENCY);
+		//this.APPEARANCE_FREQUENCY = 0.1f;
+        float MAXIMUM_SLOPE = ((float) gc.getHeight() / 2.0f) / (float) gc.getWidth() / 2.0f;
+		this.SLOPE = Logic.generateRandomFloat(0, MAXIMUM_SLOPE) - MAXIMUM_SLOPE;
 		this.initialPosition.y = position.y = Logic.generateRandomFloat((gc.getHeight() * 3)/4, gc.getHeight()/4);
 
 		try {
@@ -56,7 +51,7 @@ public class FlyingItem {
 			renderImage = renderImage.getScaledCopy(scale);
 			
 			if(soundReference != null) {
-				this.soundReference = soundReference;
+                String soundReference1 = soundReference;
 				this.sound = new Sound(soundReference);
 			}
 		} catch (SlickException e) {
@@ -64,12 +59,12 @@ public class FlyingItem {
 		}
 		
 		if(Logic.generateRandomNumber(0, 1) == 0) {
-			this.flyDirectionRight = false;
-			this.position.x = ((flySpeed * 60) * appearanceFrequency + renderImage.getWidth());
+			this.FLY_RIGHT = false;
+			this.position.x = ((flySpeed * 60) * APPEARANCE_FREQUENCY + renderImage.getWidth());
 
 		} else {
-			this.flyDirectionRight = true;
-			this.position.x = -((flySpeed * 60) * appearanceFrequency - renderImage.getWidth());
+			this.FLY_RIGHT = true;
+			this.position.x = -((flySpeed * 60) * APPEARANCE_FREQUENCY - renderImage.getWidth());
 			this.position.y = gc.getHeight()/2;
 		}
 	}
@@ -79,19 +74,19 @@ public class FlyingItem {
 	}
 	
 	public void update(GameContainer gc, StateBasedGame sbg, int delta) {
-		if(flyDirectionRight) {
+		if(FLY_RIGHT) {
 			if(position.x < -renderImage.getWidth()) {
 				position.y = initialPosition.y;
-				position.x += flySpeed * (delta/1000.0);
+				position.x += FLY_SPEED * (delta/1000.0);
 			} else if(position.x > gc.getWidth()) {
 				soundPlayed = false;
 				this.initialPosition.y = position.y = Logic.generateRandomFloat((gc.getHeight() * 3)/4, gc.getHeight()/4);
-				this.position.x = -((flySpeed * 60) * appearanceFrequency - renderImage.getWidth());
+				this.position.x = -((FLY_SPEED * 60) * APPEARANCE_FREQUENCY - renderImage.getWidth());
 			} else {
-				if(slope < 0) {
-					position.y -= (flySpeed * slope) * (delta/1000.0);
+				if(SLOPE < 0) {
+					position.y -= (FLY_SPEED * SLOPE) * (delta/1000.0);
 				} else {
-					position.y += (flySpeed * slope) * (delta/1000.0);
+					position.y += (FLY_SPEED * SLOPE) * (delta/1000.0);
 				}
 				if(sound != null) {
 					if(position.x < gc.getWidth() - 200 && !soundPlayed) {
@@ -99,22 +94,22 @@ public class FlyingItem {
 						sound.play();
 					}
 				}
-				position.x += flySpeed * (delta/1000.0);
-				renderImage.rotate((spinSpeed * (delta/1000.0f)));
+				position.x += FLY_SPEED * (delta/1000.0);
+				renderImage.rotate((SPIN_SPEED * (delta/1000.0f)));
 			}
 		} else {
 			if(position.x > gc.getWidth()) {
 				position.y = initialPosition.y;
-				position.x -= flySpeed * (delta/1000.0);
+				position.x -= FLY_SPEED * (delta/1000.0);
 			} else if(position.x < -renderImage.getWidth()) {
 				soundPlayed = false;
 				this.initialPosition.y = position.y = Logic.generateRandomFloat((gc.getHeight() * 3)/4, gc.getHeight()/4);
-				this.position.x = ((flySpeed * 60) * appearanceFrequency + renderImage.getWidth());
+				this.position.x = ((FLY_SPEED * 60) * APPEARANCE_FREQUENCY + renderImage.getWidth());
 			} else {
-				if(slope < 0) {
-					position.y -= (flySpeed * slope) * (delta/1000.0);
+				if(SLOPE < 0) {
+					position.y -= (FLY_SPEED * SLOPE) * (delta/1000.0);
 				} else {
-					position.y += (flySpeed * slope) * (delta/1000.0);
+					position.y += (FLY_SPEED * SLOPE) * (delta/1000.0);
 				}
 				if(sound != null) {
 					if(position.x > 200 && !soundPlayed) {
@@ -122,8 +117,8 @@ public class FlyingItem {
 						sound.play();
 					}
 				}
-				position.x -= flySpeed * (delta/1000.0);
-				renderImage.rotate(-(spinSpeed * (delta/1000.0f)));
+				position.x -= FLY_SPEED * (delta/1000.0);
+				renderImage.rotate(-(SPIN_SPEED * (delta/1000.0f)));
 			}
 		}
 	}

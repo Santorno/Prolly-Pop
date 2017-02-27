@@ -4,6 +4,7 @@ import org.newdawn.slick.*;
 import org.newdawn.slick.geom.Vector2f;
 import org.newdawn.slick.state.StateBasedGame;
 
+@SuppressWarnings("UnusedParameters")
 public class SplashLogo {
 
     private Image logo;
@@ -17,10 +18,12 @@ public class SplashLogo {
         position = new Vector2f((float) ((Engine.WINDOW_SIZE.getWidth() / 2) - (logo.getWidth() / 2)), -logo.getHeight());
     }
 
+    @SuppressWarnings("RedundantThrows")
     public void render(GameContainer gc, StateBasedGame sbg, Graphics g) throws SlickException {
         logo.draw(position.x, position.y);
     }
 
+    @SuppressWarnings("RedundantThrows")
     public void update(GameContainer gc, StateBasedGame sbg, int delta) throws SlickException {
         if(!logoPanned) {
             position.y += LOGO_PAN_SPEED * delta / 1000;
@@ -32,7 +35,4 @@ public class SplashLogo {
         }
     }
 
-    public boolean logoPanned() {
-        return this.logoPanned;
-    }
 }
