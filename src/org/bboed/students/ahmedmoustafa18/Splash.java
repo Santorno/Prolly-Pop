@@ -10,6 +10,7 @@ public class Splash extends BasicGameState {
 
     private Image background;
     private Sound music;
+    private Sound buttonClick;
 
     private Cloud cloud;
     private Cloud cloud2;
@@ -45,16 +46,18 @@ public class Splash extends BasicGameState {
 
         Image startButtonHover = new Image(START_BUTTON_IMAGE_PATHS[1]);
 
+        music = new Sound("resources/sounds/splash/background.ogg");
+        buttonClick = new Sound("resources/sounds/splash/pop.ogg");
+
         start = new Button(startButtonImage, startButtonHover, startButtonHitbox, Button.CENTER, Engine.WINDOW_SIZE.getHeight() - 250, new Command() {
             @Override
             public void executeCommand() {
                 start.forceUp();
+                buttonClick.play(1, 2f);
                 exitingScene = true;
                 sbg.enterState(States.PRE_GAME_STATE, null, new HorizontalSplitTransition());
             }
         });
-
-        music = new Sound("resources/sounds/splash/background.ogg");
     }
 
     @Override
@@ -70,7 +73,7 @@ public class Splash extends BasicGameState {
         start.render(g);
 
         if(!music.playing() && !exitingScene) {
-            music.loop();
+            music.loop(1, 0.4f);
         }
     }
 

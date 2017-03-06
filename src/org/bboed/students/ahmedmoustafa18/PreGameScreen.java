@@ -14,6 +14,8 @@ public class PreGameScreen extends BasicGameState {
 
     private Image background;
 
+    private Sound buttonClick;
+
     private Button backButton;
     private Button playButton;
 
@@ -23,6 +25,7 @@ public class PreGameScreen extends BasicGameState {
     private static final int BUTTON_MARGIN = 220; //pixels
     private static final String P1_USERNAME = "Player 1 Name:";
     private static final String P2_USERNAME = "Player 2 Name:";
+    private static final Color TEXT_BOX_COLOR = new Color(255, 255, 255, 160);
     private static final TrueTypeFont PRIMARY_FONT = new TrueTypeFont(new Font("Verdana", Font.PLAIN, 20), true);
 
     private static final String[] BACK_BUTTON_IMAGE_PATHS = { "resources/images/pregame/back-button.png", "resources/images/pregame/back-button-hover.png" };
@@ -45,11 +48,14 @@ public class PreGameScreen extends BasicGameState {
 
         Image backButtonHover = new Image(BACK_BUTTON_IMAGE_PATHS[1]);
 
+        buttonClick = new Sound("resources/sounds/splash/pop.ogg");
+
         backButton = new Button(backButtonImage, backButtonHover, backButtonHitbox, (float) ((Engine.WINDOW_SIZE.getWidth() / 2) - (backButtonImage.getWidth() / 2) - (BUTTON_MARGIN / 2.0)), Engine.WINDOW_SIZE.getHeight() - 250, new Command() {
             @Override
             public void executeCommand() {
                 backButton.forceUp();
                 exitingScene = true;
+                buttonClick.play(1, 2f);
                 sbg.enterState(States.SPLASH_STATE, null, new HorizontalSplitTransition());
             }
         });
@@ -62,25 +68,37 @@ public class PreGameScreen extends BasicGameState {
         playButton = new Button(playButtonImage, playButtonHover, playButtonHitbox, (float) ((Engine.WINDOW_SIZE.getWidth() / 2) - (playButtonImage.getWidth() / 2) + (BUTTON_MARGIN / 2.0)), Engine.WINDOW_SIZE.getHeight() - 250, new Command() {
             @Override
             public void executeCommand() {
+                Game.player1 = new Player(p1NameText.getText(), 1);
+                Game.player2 = new Player(p2NameText.getText(), 2);
+
+                playButton.forceUp();
                 exitingScene = true;
-                sbg.enterState(States.SPLASH_STATE, null, new HorizontalSplitTransition());
+                buttonClick.play(1, 2f);
+                sbg.enterState(States.GAME_STATE, null, new HorizontalSplitTransition());
             }
         });
 
-        p1NameText = new TextField(gc, PRIMARY_FONT, (int) Engine.WINDOW_SIZE.getWidth() / 2,(int) Engine.WINDOW_SIZE.getHeight() / 3, 200, 30);
-        p2NameText = new TextField(gc, PRIMARY_FONT, (int) Engine.WINDOW_SIZE.getWidth() / 2,(int) Engine.WINDOW_SIZE.getHeight() / 3 + 50, 200, 30);
+
+        p1NameText = new TextField(gc, PRIMARY_FONT, (int) Engine.WINDOW_SIZE.getWidth() / 2 - 50,(int) Engine.WINDOW_SIZE.getHeight() / 3, 200, 30);
+        p1NameText.setBackgroundColor(new Color(TEXT_BOX_COLOR));
+        p1NameText.setTextColor(Color.black);
+        p1NameText.setBorderColor(Color.gray);
+        p2NameText = new TextField(gc, PRIMARY_FONT, (int) Engine.WINDOW_SIZE.getWidth() / 2 - 50,(int) Engine.WINDOW_SIZE.getHeight() / 3 + 50, 200, 30);
+        p2NameText.setBackgroundColor(new Color(TEXT_BOX_COLOR));
+        p2NameText.setTextColor(Color.black);
+        p2NameText.setBorderColor(Color.gray);
     }
 
     @Override
     public void render(GameContainer gc, StateBasedGame sbg, Graphics g) throws SlickException {
-        g.setColor(Color.white);
+        g.setColor(new Color(TEXT_BOX_COLOR));
         background.draw(0, 0);
         backButton.render(g);
         playButton.render(g);
         p1NameText.render(gc, g);
         p2NameText.render(gc, g);
 
-        g.setColor(Color.black);
+        g.setColor(new Color(0, 0, 0, 255));
 
         g.drawString(P1_USERNAME, p1NameText.getX() - g.getFont().getWidth(P1_USERNAME) - 25, (int) (p1NameText.getY() + (p1NameText.getHeight() / 2.0) - (g.getFont().getLineHeight() / 2.0)));
         g.drawString(P2_USERNAME, p2NameText.getX() - g.getFont().getWidth(P1_USERNAME) - 25, (int) (p2NameText.getY() + (p2NameText.getHeight() / 2.0) - (g.getFont().getLineHeight() / 2.0)));

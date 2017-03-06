@@ -41,5 +41,6 @@ public class Engine extends StateBasedGame {
 
         this.addState(new Splash());
         this.addState(new PreGameScreen());
+        this.addState(new Game());
     }
 }
